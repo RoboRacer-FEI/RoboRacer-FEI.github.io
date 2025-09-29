@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RoboRacer — Carro Autônomo com Visão Computacional</title>
+  <meta name="description" content="RoboRacer: projeto universitário de carro autônomo que utiliza visão computacional para percepção, planejamento e controle." />
+  <meta name="keywords" content="carro autônomo, visão computacional, robótica, IA, ROS2, SLAM, planejamento de rotas" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <!-- OG -->
+  <meta property="og:title" content="RoboRacer — Autonomous Driving with Computer Vision" />
+  <meta property="og:description" content="Academic project: perception, planning and control powered by vision." />
+  <meta property="og:type" content="website" />
+  <!-- <meta property="og:url" content="https://example.edu/roboracer" /> -->
+  <!-- <meta property="og:image" content="https://example.edu/roboracer/og-image.jpg" /> -->
+
+  <!-- Favicon (replace as needed) -->
+  <!-- <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230ea5e9'/%3E%3Cpath d='M18 34h28a8 8 0 0 0 0-16H18a8 8 0 0 0 0 16zm0 0v8m28-8v8' stroke='white' stroke-width='4' fill='none'/%3E%3C/svg%3E" /> -->
+
+  <!-- JSON-LD -->
+  <!-- <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"RoboRacer",
+    "applicationCategory":"Robotics",
+    "operatingSystem":"ROS 2 / Linux",
+    "description":"Projeto de veículo autônomo baseado em visão computacional para percepção, planejamento e controle.",
+    "url":"https://example.edu/roboracer",
+    "author":{"@type":"Organization","name":"Laboratório de Robótica e Visão"},
+    "screenshot":"https://example.edu/roboracer/og-image.jpg"
+  }
+  </script> -->
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#0ea5e9',
+              2: '#22d3ee'
+            }
+          },
+          boxShadow: {
+            soft: '0 12px 32px rgba(2,6,23,0.18)'
+          }
+        }
+      },
+      darkMode: 'media'
+    }
+  </script>
+  
+  <link href="script.js" rel="stylesheet">
+
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 bg-glow">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-slate-900/60 border-b border-slate-200/70 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="h-16 flex items-center justify-between">
+        <a href="#top" class="flex items-center gap-2 font-bold tracking-wide">
+          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="#0ea5e9"/><path d="M18 34h28a8 8 0 0 0 0-16H18a8 8 0 0 0 0 16zm0 0v8m28-8v8" stroke="#001018" stroke-width="4" fill="none"/></svg>
+          <span>RoboRacer</span>
+        </a>
+        <nav class="hidden md:block">
+          <ul class="flex items-center gap-6 text-sm">
+            <li><a class="hover:text-brand" href="#sobre" data-i18n="nav.about"></a></li>
+            <li><a class="hover:text-brand" href="#pipeline" data-i18n="nav.pipeline"></a></li>
+            <li><a class="hover:text-brand" href="#stack" data-i18n="nav.stack"></a></li>
+            <li><a class="hover:text-brand" href="#demo" data-i18n="nav.demo"></a></li>
+            <li><a class="hover:text-brand" href="#resultados" data-i18n="nav.results"></a></li>
+            <li><a class="hover:text-brand" href="#contato" data-i18n="nav.contact"></a></li>
+          </ul>
+        </nav>
+        <div class="flex items-center gap-2">
+          <!-- Lang Toggle -->
+          <button id="langToggle" class="px-3 py-2 text-sm rounded-xl border border-slate-300/60 dark:border-slate-700 hover:border-brand hover:text-brand transition" aria-label="Mudar idioma">EN</button>
+          <!-- Mobile menu button -->
+          <button id="menuBtn" class="md:hidden px-3 py-2 rounded-xl border border-slate-300/60 dark:border-slate-700">☰</button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden border-t border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+        <ul class="grid gap-2 text-sm">
+          <li><a class="block py-2" href="#sobre" data-i18n="nav.about"></a></li>
+          <li><a class="block py-2" href="#pipeline" data-i18n="nav.pipeline"></a></li>
+          <li><a class="block py-2" href="#stack" data-i18n="nav.stack"></a></li>
+          <li><a class="block py-2" href="#demo" data-i18n="nav.demo"></a></li>
+          <li><a class="block py-2" href="#resultados" data-i18n="nav.results"></a></li>
+          <li><a class="block py-2" href="#contato" data-i18n="nav.contact"></a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-8">
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div class="space-y-4">
+          <span class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full border border-slate-300/70 dark:border-slate-700" data-i18n="hero.badge"></span>
+          <h1 class="text-4xl/tight sm:text-5xl/tight font-extrabold">
+            <span>RoboRacer: </span>
+            <span class="bg-gradient-to-r from-brand to-brand-2 bg-clip-text text-transparent" data-i18n="hero.title"></span>
+          </h1>
+          <p class="text-slate-600 dark:text-slate-300 max-w-prose" data-i18n="hero.lead"></p>
+          <div class="flex flex-wrap gap-2 pt-2">
+            <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="hero.tags.0"></span>
+            <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="hero.tags.1"></span>
+            <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="hero.tags.2"></span>
+            <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="hero.tags.3"></span>
+          </div>
+          <!-- <div class="flex flex-wrap gap-3 pt-3">
+            <a href="#demo" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-b from-brand to-brand-2 text-slate-950 font-semibold shadow-soft" data-i18n="hero.ctaDemo"></a>
+            <a href="whitepaper.pdf" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700" data-i18n="hero.ctaPaper"></a>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3">
+            <div class="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
+              <div class="text-xs text-slate-500" data-i18n="kpi.k1.label"></div>
+              <div class="text-xl font-extrabold">38–52</div>
+            </div>
+            <div class="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
+              <div class="text-xs text-slate-500" data-i18n="kpi.k2.label"></div>
+              <div class="text-xl font-extrabold">± 0,12 m</div>
+            </div>
+            <div class="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
+              <div class="text-xs text-slate-500" data-i18n="kpi.k3.label"></div>
+              <div class="text-xl font-extrabold">99,1%</div>
+            </div>
+            <div class="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
+              <div class="text-xs text-slate-500" data-i18n="kpi.k4.label"></div>
+              <div class="text-xl font-extrabold">128+</div>
+            </div> 
+          </div>-->
+        </div>
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-soft">
+          <svg viewBox="0 0 900 560" role="img" class="w-full h-auto bg-slate-900" aria-label="RoboRacer illustration">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop stop-color="#0ea5e9" stop-opacity="0.4" />
+                <stop offset="1" stop-color="#22d3ee" stop-opacity="0.25" />
+              </linearGradient>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#g)" />
+            <g transform="translate(100,150)">
+              <rect x="0" y="0" rx="32" width="700" height="260" fill="#0b1220" stroke="#22d3ee" opacity=".6" />
+              <rect x="140" y="40" rx="16" width="420" height="180" fill="#0f172a" stroke="#0ea5e9" />
+              <text x="350" y="130" text-anchor="middle" fill="#e5e7eb" font-size="24" font-family="ui-sans-serif">RoboRacer — Vision • Planning • Control</text>
+              <circle cx="120" cy="210" r="8" fill="#22d3ee" />
+              <text x="120" y="236" fill="#94a3b8" text-anchor="middle" font-size="12">Camera</text>
+              <circle cx="580" cy="210" r="8" fill="#22d3ee" />
+              <text x="580" y="236" fill="#94a3b8" text-anchor="middle" font-size="12">IMU</text>
+              <circle cx="350" cy="40" r="8" fill="#22d3ee" />
+              <text x="350" y="26" fill="#94a3b8" text-anchor="middle" font-size="12">Laser</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section id="sobre" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="about.title"></h2>
+      <p class="text-slate-600 dark:text-slate-300 max-w-3xl" data-i18n="about.text"></p>
+      <div class="grid md:grid-cols-3 gap-4 mt-6">
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800"><h3 class="font-semibold" data-i18n="about.cards.0.title"></h3><p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="about.cards.0.text"></p></div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800"><h3 class="font-semibold" data-i18n="about.cards.1.title"></h3><p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="about.cards.1.text"></p></div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800"><h3 class="font-semibold" data-i18n="about.cards.2.title"></h3><p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="about.cards.2.text"></p></div>
+      </div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section id="pipeline" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="pipeline.title"></h2>
+      <p class="text-slate-600 dark:text-slate-300" data-i18n="pipeline.text"></p>
+      <div class="grid md:grid-cols-4 sm:grid-cols-2 gap-4 mt-4">
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="pipeline.steps.0.title"></h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="pipeline.steps.0.text"></p>
+          <div class="flex gap-2 mt-2 text-xs"><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">OpenCV</span><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">PyTorch</span></div>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="pipeline.steps.1.title"></h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="pipeline.steps.1.text"></p>
+          <div class="flex gap-2 mt-2 text-xs"><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">Nav2</span><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">robot_localization</span></div>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="pipeline.steps.2.title"></h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="pipeline.steps.2.text"></p>
+          <div class="flex gap-2 mt-2 text-xs"><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">MPC</span><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">TEB</span></div>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="pipeline.steps.3.title"></h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="pipeline.steps.3.text"></p>
+          <div class="flex gap-2 mt-2 text-xs"><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">CAN</span><span class="px-2 py-0.5 rounded-full border border-slate-300/60 dark:border-slate-700">ROS 2</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STACK -->
+    <section id="stack" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="stack.title"></h2>
+      <div class="flex flex-wrap gap-2 mt-2">
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">ROS 2</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">Python / C++</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">OpenCV</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">PyTorch</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">CUDA</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">Nav2</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">RViz</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">Gazebo</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">Docker</span>
+        <span class="text-xs px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700">GitHub</span>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <!-- <section id="demo" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="demo.title"></h2>
+      <p class="text-slate-600 dark:text-slate-300" data-i18n="demo.text"></p>
+      <div class="aspect-video rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 mt-3 bg-black">
+        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" title="RoboRacer Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3 text-xs">
+        <span class="px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="demo.badges.0"></span>
+        <span class="px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="demo.badges.1"></span>
+        <span class="px-2.5 py-1 rounded-full border border-slate-300/60 dark:border-slate-700" data-i18n="demo.badges.2"></span>
+      </div>
+    </section> -->
+
+    <!-- RESULTADOS / PUBLICAÇÕES -->
+    <!-- <section id="resultados" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="results.title"></h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="results.metrics.title"></h3>
+          <ul class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+            <li><span data-i18n="results.metrics.items.0.label"></span> <strong>0,19 m</strong></li>
+            <li><span data-i18n="results.metrics.items.1.label"></span> <strong>0,78</strong></li>
+            <li><span data-i18n="results.metrics.items.2.label"></span> <strong>0,42 s</strong></li>
+          </ul>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="results.pubs.title"></h3>
+          <ul class="mt-2 list-disc list-inside text-sm text-brand">
+            <li><a href="#">Percepção Semântica para Direção Autônoma (2025)</a></li>
+            <li><a href="#">Integração VIO + GNSS com EKF em ROS 2 (2024)</a></li>
+          </ul>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <h3 class="font-semibold" data-i18n="results.partners.title"></h3>
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-1" data-i18n="results.partners.text"></p>
+        </div>
+      </div>
+    </section> -->
+
+    <!-- EQUIPE -->
+    <section id="equipe" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="team.title"></h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-b from-brand to-brand-2 text-slate-950 font-extrabold grid place-items-center">FP</div>
+          <div><div class="font-semibold">Fagner de Assis Moura Pimentel</div><div class="text-sm text-slate-600 dark:text-slate-300" data-i18n="team.roles.0"></div></div>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-b from-brand to-brand-2 text-slate-950 font-extrabold grid place-items-center">AM</div>
+          <div><div class="font-semibold">Isaac Jesus da Silva</div><div class="text-sm text-slate-600 dark:text-slate-300" data-i18n="team.roles.1"></div></div>
+        </div>
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-b from-brand to-brand-2 text-slate-950 font-extrabold grid place-items-center">JS</div>
+          <div><div class="font-semibold">Sofia Linheira Romeiro</div><div class="text-sm text-slate-600 dark:text-slate-300" data-i18n="team.roles.2"></div></div>
+        </div>
+        <!-- <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-b from-brand to-brand-2 text-slate-950 font-extrabold grid place-items-center">MT</div>
+          <div><div class="font-semibold">????</div><div class="text-sm text-slate-600 dark:text-slate-300" data-i18n="team.roles.3"></div></div>
+        </div> -->
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <!-- <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="faq.title"></h2>
+      <div class="grid gap-3">
+        <details class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <summary class="font-semibold cursor-pointer" data-i18n="faq.q1.q"></summary>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300" data-i18n="faq.q1.a"></p>
+        </details>
+        <details class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <summary class="font-semibold cursor-pointer" data-i18n="faq.q2.q"></summary>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300" data-i18n="faq.q2.a"></p>
+        </details>
+        <details class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <summary class="font-semibold cursor-pointer" data-i18n="faq.q3.q"></summary>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300" data-i18n="faq.q3.a"></p>
+        </details>
+      </div>
+    </section> -->
+
+    <!-- CONTATO -->
+    <!-- <section id="contato" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2" data-i18n="contact.title"></h2>
+      <p class="text-slate-600 dark:text-slate-300" data-i18n="contact.text"></p>
+      <form class="grid gap-3 max-w-xl mt-3" onsubmit="return sendMessage(event)">
+        <input required name="nome" class="px-3 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700 bg-transparent" placeholder="Seu nome / Your name" />
+        <input required type="email" name="email" class="px-3 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700 bg-transparent" placeholder="Seu e-mail / Your email" />
+        <textarea required name="mensagem" rows="5" class="px-3 py-2 rounded-xl border border-slate-300/70 dark:border-slate-700 bg-transparent" placeholder="Mensagem / Message"></textarea>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-xl bg-gradient-to-b from-brand to-brand-2 text-slate-950 font-semibold shadow-soft" data-i18n="contact.cta"></button>
+          <span id="status" class="text-sm text-slate-600 dark:text-slate-300" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+    </section> -->
+  </main>
+
+  <footer class="border-t border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600 dark:text-slate-300">
+      <div>© <span id="year"></span> RoboRacer — Laboratório de Robótica e Visão</div>
+      <div class="flex gap-4">
+        <a class="hover:text-brand" href="#top" data-i18n="footer.backToTop"></a>
+        <a class="opacity-60 pointer-events-none" href="#">GitHub (em breve / coming soon)</a>
+        <a class="opacity-60 pointer-events-none" href="#">Docs (em breve / coming soon)</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple i18n engine (PT/EN)
+    const dict = {
+      pt: {
+        nav: { about: 'Sobre', pipeline: 'Pipeline', stack: 'Tecnologias', demo: 'Demo', results: 'Resultados', contact: 'Contato' },
+        hero: {
+          badge: 'Projeto universitário · Visão computacional + ROS 2',
+          title: 'carro autônomo orientado por visão',
+          lead: 'Integramos câmeras, IA e controle em um protótipo capaz de perceber o ambiente, planejar trajetórias seguras e executar manobras urbanas de forma autônoma.',
+          tags: ['Detecção semântica','SLAM visual','Planejamento','ROS 2'],
+          ctaDemo: '▶ Assista ao demo',
+          ctaPaper: '📄 Whitepaper (PDF)'
+        },
+        kpi: {
+          k1:{label:'FPS de percepção'},
+          k2:{label:'Desvio lateral médio'},
+          k3:{label:'Taxa de parada segura'},
+          k4:{label:'Km autônomos'}
+        },
+        about: {
+          title:'Sobre o projeto',
+          text:'O RoboRacer é um projeto acadêmico focado em autonomia veicular com ênfase em visão computacional. Exploramos detecção semântica, estimativa de profundidade, SLAM visual e planejamento reativo para condução segura em ambientes urbanos controlados e pistas de testes.',
+          cards:[
+            {title:'Missão', text:'Avançar pesquisa aplicada com sensores de baixo custo e software aberto.'},
+            {title:'Impacto', text:'Formação de alunos, publicações e provas de conceito para a indústria.'},
+            {title:'Valores', text:'Segurança, reprodutibilidade, ética de IA e dados abertos.'}
+          ]
+        },
+        pipeline: {
+          title:'Pipeline de Visão & Autonomia',
+          text:'Da captura ao atuador, um stack modular e extensível.',
+          steps:[
+            {title:'1) Percepção', text:'RGB/estéreo, detecção (YOLO/DETR), segmentação, profundidade monocular.'},
+            {title:'2) Localização & SLAM', text:'VIO/ORB-SLAM3, fusão IMU/GNSS com EKF/UKF, mapa semântico.'},
+            {title:'3) Planejamento', text:'A* global + MPC/TEB local, predição de trajetórias de agentes.'},
+            {title:'4) Controle', text:'Stanley/PID, limitação de curvatura e paradas de segurança.'}
+          ]
+        },
+        stack: { title:'Tecnologias' },
+        demo: {
+          title:'Assista ao demo',
+          text:'Trechos de navegação autônoma em pista fechada e simulação 3D. Substitua a URL abaixo pelo seu vídeo.',
+          badges:['Velocidade máx.: 25 km/h','FPS percepção: 45','Inferência EDGE']
+        },
+        results: {
+          title:'Resultados & Publicações',
+          metrics: { title:'Métricas', items:[{label:'ATE (trajetória)'},{label:'IoU (faixas/placas)'},{label:'Tempo de parada médio'}]},
+          pubs: { title:'Publicações' },
+          partners: { title:'Parcerias', text:'Abertos a cooperação com empresas e laboratórios para testes, datasets e P&D.' }
+        },
+        team: { title:'Equipe', roles:['Coordenação & Navegação','Coordenação e Visão Computacional','Capitã da equipe',''] },
+        faq: {
+          title:'Perguntas frequentes',
+          q1:{ q:'É apenas visão ou vocês usam LiDAR?', a:'O foco é visão. Para cenários específicos, avaliamos LiDAR/radar como sensores complementares.' },
+          q2:{ q:'Qual hardware de inferência?', a:'GPU NVIDIA embarcada (8–16GB) e versões otimizadas via TensorRT/ONNX Runtime.' },
+          q3:{ q:'O código é aberto?', a:'Módulos de pesquisa serão liberados sob licença permissiva. Entre em contato para roadmap.' }
+        },
+        contact: { title:'Fale com a gente', text:'Parcerias, mídia, demonstrações e intercâmbio acadêmico.', cta:'Enviar mensagem' },
+        footer: { backToTop:'Voltar ao topo ↑' }
+      },
+      en: {
+        nav: { about: 'About', pipeline: 'Pipeline', stack: 'Tech Stack', demo: 'Demo', results: 'Results', contact: 'Contact' },
+        hero: {
+          badge: 'University project · Computer Vision + ROS 2',
+          title: 'a vision‑driven autonomous car',
+          lead: 'We integrate cameras, AI and control in a prototype that perceives the environment, plans safe trajectories and executes urban maneuvers autonomously.',
+          tags: ['Semantic detection','Visual SLAM','planning','ROS 2'],
+          ctaDemo: '▶ Watch demo',
+          ctaPaper: '📄 Whitepaper (PDF)'
+        },
+        kpi: {
+          k1:{label:'Perception FPS'},
+          k2:{label:'Mean lateral error'},
+          k3:{label:'Safe stop rate'},
+          k4:{label:'Autonomous km'}
+        },
+        about: {
+          title:'About the project',
+          text:'RoboRacer is an academic initiative focused on vehicle autonomy with an emphasis on computer vision. We explore semantic detection, depth estimation, visual SLAM and reactive planning for safe driving in controlled urban tracks.',
+          cards:[
+            {title:'Mission', text:'Advance applied research using low‑cost sensors and open software.'},
+            {title:'Impact', text:'Student training, publications, and industry proof‑of‑concepts.'},
+            {title:'Values', text:'Safety, reproducibility, AI ethics and open data.'}
+          ]
+        },
+        pipeline: {
+          title:'Vision & Autonomy Pipeline',
+          text:'From capture to actuators, a modular, extensible stack.',
+          steps:[
+            {title:'1) Perception', text:'RGB/stereo, detection (YOLO/DETR), segmentation, monocular depth.'},
+            {title:'2) Localization & SLAM', text:'VIO/ORB‑SLAM3, IMU/GNSS fusion with EKF/UKF, semantic map.'},
+            {title:'3) Planning', text:'Global A* + local MPC/TEB, agent trajectory prediction.'},
+            {title:'4) Control', text:'Stanley/PID, curvature limits and safety stops.'}
+          ]
+        },
+        stack: { title:'Tech Stack' },
+        demo: {
+          title:'Watch the demo',
+          text:'Clips of autonomous navigation on a closed track and 3D simulation. Replace the URL below with your video.',
+          badges:['Top speed: 25 km/h','Perception FPS: 45','EDGE inference']
+        },
+        results: {
+          title:'Results & Publications',
+          metrics: { title:'Metrics', items:[{label:'ATE (trajectory)'},{label:'IoU (lanes/signs)'},{label:'Average stop time'}]},
+          pubs: { title:'Publications' },
+          partners: { title:'Partnerships', text:'Open to collaboration with industry and labs for testing, datasets and R&D.' }
+        },
+        team: { title:'Team', roles:['Lead & Navigation','Lead & Computer Vision','Team Leader',''] },
+        faq: {
+          title:'FAQ',
+          q1:{ q:'Is it vision‑only or do you use LiDAR?', a:'Vision is our focus. For specific scenarios we assess LiDAR/radar as complementary sensors.' },
+          q2:{ q:'Which inference hardware?', a:'Embedded NVIDIA GPU (8–16GB) with TensorRT/ONNX Runtime optimizations.' },
+          q3:{ q:'Is the code open‑source?', a:'Research modules will be released under a permissive license. Contact us for the roadmap.' }
+        },
+        contact: { title:'Get in touch', text:'Partnerships, media, demos and academic exchanges.', cta:'Send message' },
+        footer: { backToTop:'Back to top ↑' }
+      }
+    };
+
+    const els = document.querySelectorAll('[data-i18n]');
+    function applyLang(lang){
+      const t = dict[lang] || dict.pt;
+      els.forEach(el=>{
+        const path = el.getAttribute('data-i18n').split('.');
+        let val = t;
+        for(const p of path){ val = val?.[p]; }
+        if(Array.isArray(val)) { el.textContent = val.join(', '); }
+        else if(typeof val === 'string') { el.textContent = val; }
+      });
+      document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
+      document.getElementById('langToggle').textContent = lang === 'en' ? 'PT' : 'EN';
+      localStorage.setItem('roboracer_lang', lang);
+      // Title/desc
+      document.title = lang==='en' ? 'RoboRacer — Autonomous Car with Computer Vision' : 'RoboRacer — Carro Autônomo com Visão Computacional';
+    }
+
+    // menu mobile
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click',()=> mobileMenu.classList.toggle('hidden'));
+
+    // lang toggle
+    const langBtn = document.getElementById('langToggle');
+    const saved = localStorage.getItem('roboracer_lang') || (navigator.language?.startsWith('en') ? 'en':'pt');
+    langBtn?.addEventListener('click',()=>{
+      const current = document.documentElement.lang === 'en' ? 'en' : 'pt';
+      applyLang(current==='en' ? 'pt' : 'en');
+    });
+    applyLang(saved);
+
+    // footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // fake form sender
+    async function sendMessage(ev){
+      ev.preventDefault();
+      const status = document.getElementById('status');
+      status.textContent = document.documentElement.lang==='en' ? 'Sending…' : 'Enviando…';
+      try{
+        await new Promise(r=>setTimeout(r,800));
+        ev.target.reset();
+        status.textContent = document.documentElement.lang==='en' ? 'Received! We will reply soon.' : 'Recebido! Responderemos em breve.';
+      }catch(e){
+        status.textContent = document.documentElement.lang==='en' ? 'Failed to send. Try again.' : 'Falha ao enviar. Tente novamente.';
+      }
+      return false;
+    }
+    window.sendMessage = sendMessage;
+  </script>
+</body>
+</html>
